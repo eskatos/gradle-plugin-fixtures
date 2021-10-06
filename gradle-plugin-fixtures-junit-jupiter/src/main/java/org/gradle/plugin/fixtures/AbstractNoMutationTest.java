@@ -17,6 +17,63 @@ public abstract class AbstractNoMutationTest extends AbstractJUnitJupiterFixture
     File tmp;
 
     @Test
+    public void doesntForceAnyTaskCreationAtConfigurationTime() {
+
+        File projectDir = underTestBuildDirectory();
+
+        File init = new File(tmp, "only-help.init.gradle");
+        GFileUtils.writeFile(onlyHelpConfiguredInitScript(), init);
+
+        GradleRunner runner = GradleRunner.create()
+                .forwardOutput()
+                .withPluginClasspath()
+                .withProjectDir(projectDir)
+                .withArguments("help", "-I", init.getAbsolutePath());
+
+        runner.build();
+    }
+
+    private String onlyHelpConfiguredInitScript() {
+        return "allprojects { p ->\n" +
+                "  p.tasks.withType(Task).configureEach { t ->\n" +
+                "    if (t.name != 'help') {\n" +
+                "      throw new Exception(\"Task '$t' was configured but it should not be!\")" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+    }
+
+    @Test
+    public void doesntForceAllTasksConfigurationWhenOwnTaskConfigured() {
+        // run fancy
+        // make sure help task not configured
+
+        File projectDir = underTestBuildDirectory();
+        String taskPath = underTestTaskPath();
+
+        File init = new File(tmp, "only-task.init.gradle");
+        GFileUtils.writeFile(onlyTaskConfiguredInitScript(taskPath), init);
+
+        GradleRunner runner = GradleRunner.create()
+                .forwardOutput()
+                .withPluginClasspath()
+                .withProjectDir(projectDir)
+                .withArguments(taskPath, "-I", init.getAbsolutePath());
+
+        runner.build();
+    }
+
+    private String onlyTaskConfiguredInitScript(String taskPath) {
+        return "allprojects { p ->\n" +
+                "  p.tasks.withType(Task).configureEach { t ->\n" +
+                "    if (t.path != '" + taskPath + "') {\n" +
+                "      throw new Exception(\"Task '$t' was configured but it should not be!\")" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+    }
+
+    @Test
     public void taskCachingAndRelocatability() {
 
         File projectDir = underTestBuildDirectory();
