@@ -160,7 +160,7 @@ public abstract class AbstractWellBehavedPluginTest {
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
             Class<?> testClass = context.getTestClass().get();
             AbstractWellBehavedPluginTest instance = (AbstractWellBehavedPluginTest) testClass.getDeclaredConstructor().newInstance();
-            return instance.taskInputMutationArguments().map(arguments -> Arguments.of(Named.of(arguments.inputName, arguments)));
+            return instance.taskInputMutationArguments().map(arguments -> Arguments.of(Named.of("for input '" + arguments.inputName + "'", arguments)));
         }
     }
 
