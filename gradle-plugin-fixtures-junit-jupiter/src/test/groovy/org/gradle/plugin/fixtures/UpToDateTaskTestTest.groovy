@@ -3,6 +3,7 @@ package org.gradle.plugin.fixtures
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.util.internal.GFileUtils
+import org.gradle.util.internal.TextUtil
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -29,7 +30,7 @@ class UpToDateTaskTestTest extends Specification {
             
             dependencies {
                 testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-                testImplementation(files("${new File("build/libs/gradle-plugin-fixtures-junit-jupiter.jar").absolutePath}"))
+                testImplementation(files("${TextUtil.escapeString(new File("build/libs/gradle-plugin-fixtures-junit-jupiter.jar").absolutePath)}"))
             }
             
             repositories {
