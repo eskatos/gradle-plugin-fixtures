@@ -88,13 +88,13 @@ class UpToDateTaskTestTest extends Specification {
             }
         """.stripIndent()
         file("src/test/groovy/FancyUpToDateTest.groovy") << """
-        import org.gradle.plugin.fixtures.AbstractUpToDateTaskTest
+        import org.gradle.plugin.fixtures.AbstractWithInputMutationTest
         import java.io.File
         import java.util.function.Consumer;
         import org.junit.jupiter.api.io.TempDir
         import static org.junit.jupiter.api.Assertions.assertEquals;
 
-        class FancyUpToDateTest extends AbstractUpToDateTaskTest {
+        class FancyUpToDateTest extends AbstractWithInputMutationTest {
         
             @TempDir
             File tmp
@@ -133,12 +133,12 @@ class UpToDateTaskTestTest extends Specification {
         }
         """.stripIndent()
         file("src/test/groovy/FancyCacheableTaskTest.groovy") << """
-        import org.gradle.plugin.fixtures.AbstractCacheableTaskTest
+        import org.gradle.plugin.fixtures.AbstractNoMutationTest
         import java.io.File
         import org.junit.jupiter.api.io.TempDir
         import static org.junit.jupiter.api.Assertions.assertEquals;
 
-        class FancyCacheableTaskTest extends AbstractCacheableTaskTest {
+        class FancyCacheableTaskTest extends AbstractNoMutationTest {
         
             @TempDir
             File tmp

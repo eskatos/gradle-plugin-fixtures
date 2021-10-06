@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public abstract class AbstractUpToDateTaskTest extends AbstractJUnitJupiterFixtureTest {
+public abstract class AbstractWithInputMutationTest extends AbstractJUnitJupiterFixtureTest {
 
     protected abstract Consumer<File> initialUnderTestBuildDirectoryAssertion();
 

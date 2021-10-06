@@ -11,7 +11,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public abstract class AbstractCacheableTaskTest extends AbstractJUnitJupiterFixtureTest {
+public abstract class AbstractNoMutationTest extends AbstractJUnitJupiterFixtureTest {
 
     @TempDir
     File tmp;
