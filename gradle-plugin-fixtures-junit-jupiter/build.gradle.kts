@@ -3,6 +3,9 @@ plugins {
     `java-library`
 }
 
+group = "org.gradle.libs"
+version = "0.1-SNAPSHOT"
+
 repositories {
     mavenCentral()
 }
