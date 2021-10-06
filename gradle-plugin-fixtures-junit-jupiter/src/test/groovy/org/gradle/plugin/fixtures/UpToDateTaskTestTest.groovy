@@ -24,8 +24,6 @@ class UpToDateTaskTestTest extends Specification {
                 useJUnitPlatform()
                 testLogging {
                     showStandardStreams = true
-                    events "failed"
-                    exceptionFormat "full"
                 }
             }
             

@@ -1,4 +1,3 @@
-
 plugins {
     groovy
     `java-library`
@@ -22,4 +21,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     dependsOn(tasks.jar)
+    testLogging {
+        showStandardStreams = true
+    }
 }
