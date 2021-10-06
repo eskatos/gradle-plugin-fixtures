@@ -2,7 +2,6 @@ package org.gradle.plugin.fixtures
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.gradle.util.internal.GFileUtils
 import org.gradle.util.internal.TextUtil
 import spock.lang.Specification
 import spock.lang.TempDir
@@ -169,13 +168,6 @@ class UpToDateTaskTestTest extends Specification {
 
         then: "success"
         result.task(":test").outcome == TaskOutcome.SUCCESS
-
-        cleanup:
-        def report = file("build/reports/tests/test/index.html")
-        if (report.isFile()) {
-            def reportDir = report.parentFile
-            GFileUtils.copyDirectory(reportDir, new File("/home/paul/boom"))
-        }
     }
 
     File file(String path) {
