@@ -6,7 +6,7 @@ import org.gradle.util.internal.TextUtil
 import spock.lang.Specification
 import spock.lang.TempDir
 
-class UpToDateTaskTestTest extends Specification {
+class WellBehavedPluginTestTest extends Specification {
 
     @TempDir
     File tmp
