@@ -29,6 +29,7 @@ class UpToDateTaskTestTest extends Specification {
             
             dependencies {
                 testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+                testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.1")
                 testImplementation(files("${TextUtil.escapeString(new File("build/libs/gradle-plugin-fixtures-junit-jupiter.jar").absolutePath)}"))
             }
             
@@ -89,6 +90,9 @@ class UpToDateTaskTestTest extends Specification {
         import org.gradle.plugin.fixtures.AbstractWithInputMutationTest
         import java.io.File
         import java.util.function.Consumer;
+        import java.util.stream.Stream
+        import org.junit.jupiter.api.extension.ExtensionContext
+        import org.junit.jupiter.params.provider.Arguments
         import org.junit.jupiter.api.io.TempDir
         import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -97,33 +101,47 @@ class UpToDateTaskTestTest extends Specification {
             @TempDir
             File tmp
         
+            @Override
             protected File underTestBuildDirectory() {
                 file("settings.gradle") << "rootProject.name = 'testception'"
                 file("build.gradle") << "plugins { id 'fancy' }"
                 return tmp
             }
         
+            @Override
             protected String underTestTaskPath() {
                 return ":fancy"
             }
             
+            @Override
             protected Consumer<File> initialUnderTestBuildDirectoryAssertion() {
                 return { dir -> 
                     assertEquals("PREFIX TEXT SUFFIX", new File(dir, "build/the-file.txt").text)  
                 }
             }
             
-            protected Consumer<File> underTestBuildDirectoryMutation() {
-                return { dir -> new File(dir, "gradle.properties").text = "theText=SomeText" }
+            @Override
+            protected Stream<TaskInputMutationArgument> taskInputMutationArguments() {
+                return Stream.of(
+                    new TaskInputMutationArgument(
+                        "thePrefix", 
+                        { dir -> new File(dir, "gradle.properties").text = "thePrefix=SomePrefix" },
+                        { dir -> assertEquals("SomePrefix TEXT SUFFIX", new File(dir, "build/the-file.txt").text) }
+                    ),
+                    new TaskInputMutationArgument(
+                        "theText",
+                        { dir -> new File(dir, "gradle.properties").text = "theText=SomeText" },
+                        { dir -> assertEquals("PREFIX SomeText SUFFIX", new File(dir, "build/the-file.txt").text) }
+                    ),
+                    new TaskInputMutationArgument(
+                        "theSuffix",
+                        { dir -> new File(dir, "gradle.properties").text = "theSuffix=SomeSuffix" },
+                        { dir -> assertEquals("PREFIX TEXT SomeSuffix", new File(dir, "build/the-file.txt").text) }
+                    )
+                )
             }
-            
-            protected Consumer<File> mutatedUnderTestBuildDirectoryAssertion() {
-                return { dir -> 
-                    assertEquals("PREFIX SomeText SUFFIX", new File(dir, "build/the-file.txt").text)  
-                }
-            }
-            
-             File file(String path) {
+
+            File file(String path) {
                 return new File(tmp, path).tap {
                     parentFile.mkdirs()
                 }
@@ -141,17 +159,19 @@ class UpToDateTaskTestTest extends Specification {
             @TempDir
             File tmp
         
+            @Override
             protected File underTestBuildDirectory() {
                 file("settings.gradle") << "rootProject.name = 'testception'"
                 file("build.gradle") << "plugins { id 'fancy' }"
                 return tmp
             }
         
+            @Override
             protected String underTestTaskPath() {
                 return ":fancy"
             }
-            
-             File file(String path) {
+
+            File file(String path) {
                 return new File(tmp, path).tap {
                     parentFile.mkdirs()
                 }

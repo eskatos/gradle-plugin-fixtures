@@ -11,6 +11,7 @@ dependencies {
 
     compileOnly(gradleTestKit())
     implementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    implementation("org.junit.jupiter:junit-jupiter-params:5.8.1")
 
     testImplementation(gradleTestKit())
     testImplementation("org.codehaus.groovy:groovy:3.0.7")
