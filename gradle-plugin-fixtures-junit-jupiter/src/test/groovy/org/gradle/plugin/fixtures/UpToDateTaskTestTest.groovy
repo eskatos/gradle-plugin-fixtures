@@ -53,6 +53,7 @@ class UpToDateTaskTestTest extends Specification {
             import org.gradle.api.provider.*
             import org.gradle.api.tasks.*
 
+            @CacheableTask
             abstract class FancyTask extends DefaultTask {
             
                 @Input
@@ -86,14 +87,14 @@ class UpToDateTaskTestTest extends Specification {
                 }
             }
         """.stripIndent()
-        file("src/test/groovy/FancyTest.groovy") << """
+        file("src/test/groovy/FancyUpToDateTest.groovy") << """
         import org.gradle.plugin.fixtures.AbstractUpToDateTaskTest
         import java.io.File
         import java.util.function.Consumer;
         import org.junit.jupiter.api.io.TempDir
         import static org.junit.jupiter.api.Assertions.assertEquals;
 
-        class FancyTest extends AbstractUpToDateTaskTest {
+        class FancyUpToDateTest extends AbstractUpToDateTaskTest {
         
             @TempDir
             File tmp
@@ -122,6 +123,34 @@ class UpToDateTaskTestTest extends Specification {
                 return { dir -> 
                     assertEquals("PREFIX SomeText SUFFIX", new File(dir, "build/the-file.txt").text)  
                 }
+            }
+            
+             File file(String path) {
+                return new File(tmp, path).tap {
+                    parentFile.mkdirs()
+                }
+            }
+        }
+        """.stripIndent()
+        file("src/test/groovy/FancyCacheableTaskTest.groovy") << """
+        import org.gradle.plugin.fixtures.AbstractCacheableTaskTest
+        import java.io.File
+        import org.junit.jupiter.api.io.TempDir
+        import static org.junit.jupiter.api.Assertions.assertEquals;
+
+        class FancyCacheableTaskTest extends AbstractCacheableTaskTest {
+        
+            @TempDir
+            File tmp
+        
+            protected File underTestBuildDirectory() {
+                file("settings.gradle") << "rootProject.name = 'testception'"
+                file("build.gradle") << "plugins { id 'fancy' }"
+                return tmp
+            }
+        
+            protected String underTestTaskPath() {
+                return ":fancy"
             }
             
              File file(String path) {
