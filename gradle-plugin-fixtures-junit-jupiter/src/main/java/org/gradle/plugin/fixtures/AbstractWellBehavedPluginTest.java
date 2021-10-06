@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class AbstractWellBehavedPluginTest {
 
     @TempDir
-    File tmp;
+    File abstractWellBehavedPluginTemporaryDir;
 
     protected abstract File underTestBuildDirectory();
 
@@ -39,7 +39,7 @@ public abstract class AbstractWellBehavedPluginTest {
 
         File projectDir = underTestBuildDirectory();
 
-        File init = new File(tmp, "only-help.init.gradle");
+        File init = new File(abstractWellBehavedPluginTemporaryDir, "only-help.init.gradle");
         GFileUtils.writeFile(onlyHelpConfiguredInitScript(), init);
 
         GradleRunner runner = GradleRunner.create()
@@ -67,7 +67,7 @@ public abstract class AbstractWellBehavedPluginTest {
         File projectDir = underTestBuildDirectory();
         String taskPath = underTestTaskPath();
 
-        File init = new File(tmp, "only-task.init.gradle");
+        File init = new File(abstractWellBehavedPluginTemporaryDir, "only-task.init.gradle");
         GFileUtils.writeFile(onlyTaskConfiguredInitScript(taskPath), init);
 
         GradleRunner runner = GradleRunner.create()
@@ -95,13 +95,13 @@ public abstract class AbstractWellBehavedPluginTest {
         File projectDir = underTestBuildDirectory();
         String taskPath = underTestTaskPath();
 
-        File copy1 = new File(tmp, "copy_1");
-        File copy2 = new File(tmp, "copy_2");
+        File copy1 = new File(abstractWellBehavedPluginTemporaryDir, "copy_1");
+        File copy2 = new File(abstractWellBehavedPluginTemporaryDir, "copy_2");
         GFileUtils.copyDirectory(projectDir, copy1);
         GFileUtils.copyDirectory(projectDir, copy2);
 
-        File init = new File(tmp, "isolated_build_cache.init.gradle");
-        File localCache = new File(tmp, "isolated_build_cache");
+        File init = new File(abstractWellBehavedPluginTemporaryDir, "isolated_build_cache.init.gradle");
+        File localCache = new File(abstractWellBehavedPluginTemporaryDir, "isolated_build_cache");
         GFileUtils.writeFile(isolatedLocalBuildCacheInitScript(localCache), init);
 
         GradleRunner runner = GradleRunner.create()

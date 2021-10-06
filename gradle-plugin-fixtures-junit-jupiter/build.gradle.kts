@@ -21,8 +21,4 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-    dependsOn(tasks.jar)
-    testLogging {
-        showStandardStreams = true
-    }
 }
