@@ -87,7 +87,7 @@ class UpToDateTaskTestTest extends Specification {
             }
         """.stripIndent()
         file("src/test/groovy/FancyUpToDateTest.groovy") << """
-        import org.gradle.plugin.fixtures.AbstractWithInputMutationTest
+        import org.gradle.plugin.fixtures.AbstractWellBehavedPluginTest
         import java.io.File
         import java.util.function.Consumer;
         import java.util.stream.Stream
@@ -96,7 +96,7 @@ class UpToDateTaskTestTest extends Specification {
         import org.junit.jupiter.api.io.TempDir
         import static org.junit.jupiter.api.Assertions.assertEquals;
 
-        class FancyUpToDateTest extends AbstractWithInputMutationTest {
+        class FancyUpToDateTest extends AbstractWellBehavedPluginTest {
         
             @TempDir
             File tmp
@@ -139,36 +139,6 @@ class UpToDateTaskTestTest extends Specification {
                         { dir -> assertEquals("PREFIX TEXT SomeSuffix", new File(dir, "build/the-file.txt").text) }
                     )
                 )
-            }
-
-            File file(String path) {
-                return new File(tmp, path).tap {
-                    parentFile.mkdirs()
-                }
-            }
-        }
-        """.stripIndent()
-        file("src/test/groovy/FancyCacheableTaskTest.groovy") << """
-        import org.gradle.plugin.fixtures.AbstractNoMutationTest
-        import java.io.File
-        import org.junit.jupiter.api.io.TempDir
-        import static org.junit.jupiter.api.Assertions.assertEquals;
-
-        class FancyCacheableTaskTest extends AbstractNoMutationTest {
-        
-            @TempDir
-            File tmp
-        
-            @Override
-            protected File underTestBuildDirectory() {
-                file("settings.gradle") << "rootProject.name = 'testception'"
-                file("build.gradle") << "plugins { id 'fancy' }"
-                return tmp
-            }
-        
-            @Override
-            protected String underTestTaskPath() {
-                return ":fancy"
             }
 
             File file(String path) {
