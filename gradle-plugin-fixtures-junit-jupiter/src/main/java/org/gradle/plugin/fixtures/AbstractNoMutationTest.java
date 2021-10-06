@@ -4,6 +4,7 @@ import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.gradle.util.internal.GFileUtils;
+import org.gradle.util.internal.TextUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -107,7 +108,7 @@ public abstract class AbstractNoMutationTest extends AbstractJUnitJupiterFixture
 
     private String isolatedLocalBuildCacheInitScript(File dir) {
         return "settingsEvaluated { settings ->\n" +
-                "  settings.buildCache.local.directory = '" + dir.getAbsolutePath() + "'" +
+                "  settings.buildCache.local.directory = '" + TextUtil.escapeString(dir.getAbsolutePath()) + "'" +
                 "}\n";
     }
 }
