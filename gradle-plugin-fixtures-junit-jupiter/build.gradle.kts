@@ -1,14 +1,10 @@
 plugins {
+    id("gradle-plugin-fixtures-java-library")
     groovy
-    `java-library`
 }
 
 group = "org.gradle.libs"
 version = "0.1-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
 
