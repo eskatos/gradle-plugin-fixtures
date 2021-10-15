@@ -6,7 +6,6 @@ import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.gradle.util.internal.GFileUtils;
 import org.gradle.util.internal.TextUtil;
-import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.io.TempDir;
@@ -16,7 +15,10 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +37,7 @@ public abstract class AbstractWellBehavedPluginTest {
     protected abstract Stream<TaskInputMutationArgument> taskInputMutationArguments();
 
     @Test
-    public void doesntForceAnyTaskCreationAtConfigurationTime() {
+    public void doesntForceAnyTaskConfigurationAtConfigurationTime() {
 
         File projectDir = underTestBuildDirectory();
 
@@ -52,9 +54,10 @@ public abstract class AbstractWellBehavedPluginTest {
     }
 
     private String onlyHelpConfiguredInitScript() {
+        // This also allows 'clean' to be configured because it still is eagerly configured in Gradle core
         return "allprojects { p ->\n" +
                 "  p.tasks.withType(Task).configureEach { t ->\n" +
-                "    if (t.name != 'help') {\n" +
+                "    if (t.name !in ['help', 'clean']) {\n" +
                 "      throw new Exception(\"Task '$t' was configured but it should not be!\")" +
                 "    }\n" +
                 "  }\n" +
@@ -62,13 +65,13 @@ public abstract class AbstractWellBehavedPluginTest {
     }
 
     @Test
-    public void doesntForceAllTasksConfigurationWhenOwnTaskConfigured() {
+    public void doesntForceExtraTasksConfigurationWhenOwnTaskIsScheduled() {
 
         File projectDir = underTestBuildDirectory();
         String taskPath = underTestTaskPath();
 
         File init = new File(abstractWellBehavedPluginTemporaryDir, "only-task.init.gradle");
-        GFileUtils.writeFile(onlyTaskConfiguredInitScript(taskPath), init);
+        GFileUtils.writeFile(noExtraConfiguredTasksInitScript(), init);
 
         GradleRunner runner = GradleRunner.create()
                 .forwardOutput()
@@ -79,14 +82,26 @@ public abstract class AbstractWellBehavedPluginTest {
         runner.build();
     }
 
-    private String onlyTaskConfiguredInitScript(String taskPath) {
-        return "allprojects { p ->\n" +
-                "  p.tasks.withType(Task).configureEach { t ->\n" +
-                "    if (t.path != '" + taskPath + "') {\n" +
-                "      throw new Exception(\"Task '$t' was configured but it should not be!\")" +
+    private String noExtraConfiguredTasksInitScript() {
+        List<String> expectedExtra = expectedExtraConfiguredTaskPaths();
+        return "def configuredTaskPaths = [] as List<String>\n" +
+                "gradle.allprojects { p ->\n" +
+                "    p.tasks.withType(Task).configureEach { task ->\n" +
+                "        configuredTaskPaths += task.path\n" +
                 "    }\n" +
-                "  }\n" +
-                "}";
+                "}\n" +
+                "gradle.taskGraph.whenReady { graph ->\n" +
+                "    def scheduledTaskPaths = graph.allTasks.collect { it.path }\n" +
+                "    def expectedExtraConfiguredTaskPaths = [" + expectedExtra.stream().collect(Collectors.joining("', ", "'", "'")) + "]\n" +
+                "    def extraConfiguredTaskPaths = configuredTaskPaths - scheduledTaskPaths - expectedExtraConfiguredTaskPaths\n" +
+                "    if (!extraConfiguredTaskPaths.empty) {\n" +
+                "        throw new GradleException(\"Unscheduled tasks were configured: $extraConfiguredTaskPaths\")\n" +
+                "    }\n" +
+                "}\n";
+    }
+
+    protected List<String> expectedExtraConfiguredTaskPaths() {
+        return Collections.emptyList();
     }
 
     @Test
