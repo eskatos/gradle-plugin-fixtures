@@ -84,18 +84,22 @@ public abstract class AbstractWellBehavedPluginTest {
 
     private String noExtraConfiguredTasksInitScript() {
         List<String> expectedExtra = expectedExtraConfiguredTaskPaths();
-        return "def configuredTaskPaths = [] as List<String>\n" +
+        return "List<String> configuredTaskPaths = []\n" +
                 "gradle.allprojects { p ->\n" +
                 "    p.tasks.withType(Task).configureEach { task ->\n" +
                 "        configuredTaskPaths += task.path\n" +
                 "    }\n" +
                 "}\n" +
                 "gradle.taskGraph.whenReady { graph ->\n" +
-                "    def scheduledTaskPaths = graph.allTasks.collect { it.path }\n" +
-                "    def expectedExtraConfiguredTaskPaths = [" + expectedExtra.stream().collect(Collectors.joining("', ", "'", "'")) + "]\n" +
-                "    def extraConfiguredTaskPaths = configuredTaskPaths - scheduledTaskPaths - expectedExtraConfiguredTaskPaths\n" +
+                "    List<String> scheduledTaskPaths = graph.allTasks.collect { it.path }\n" +
+                "    List<String> expectedExtraConfiguredTaskPaths = [" + expectedExtra.stream().collect(Collectors.joining("', ", "'", "'")) + "]\n" +
+                "    List<String> extraConfiguredTaskPaths = (configuredTaskPaths - scheduledTaskPaths - expectedExtraConfiguredTaskPaths).findAll { !it.empty }\n" +
                 "    if (!extraConfiguredTaskPaths.empty) {\n" +
                 "        throw new GradleException(\"Unscheduled tasks were configured: $extraConfiguredTaskPaths\")\n" +
+                "    }\n" +
+                "    List<String> unexpectedExtraConfiguredTaskPaths = (expectedExtraConfiguredTaskPaths - configuredTaskPaths).findAll { !it.empty }\n" +
+                "    if (!unexpectedExtraConfiguredTaskPaths.empty) {\n" +
+                "        throw new GradleException(\"Expected extra configured tasks were not configured: $unexpectedExtraConfiguredTaskPaths\")\n" +
                 "    }\n" +
                 "}\n";
     }
