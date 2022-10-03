@@ -92,7 +92,7 @@ public abstract class AbstractWellBehavedPluginTest {
                 "}\n" +
                 "gradle.taskGraph.whenReady { graph ->\n" +
                 "    List<String> scheduledTaskPaths = graph.allTasks.collect { it.path }\n" +
-                "    List<String> expectedExtraConfiguredTaskPaths = [" + expectedExtra.stream().collect(Collectors.joining("', ", "'", "'")) + "]\n" +
+                "    List<String> expectedExtraConfiguredTaskPaths = [" + expectedExtra.stream().collect(Collectors.joining("', '", "'", "'")) + "]\n" +
                 "    List<String> extraConfiguredTaskPaths = (configuredTaskPaths - scheduledTaskPaths - expectedExtraConfiguredTaskPaths).findAll { !it.empty }\n" +
                 "    if (!extraConfiguredTaskPaths.empty) {\n" +
                 "        throw new GradleException(\"Unscheduled tasks were configured: $extraConfiguredTaskPaths\")\n" +

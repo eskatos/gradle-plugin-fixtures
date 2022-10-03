@@ -10,3 +10,6 @@ plugins {
 
 include("gradle-plugin-fixtures-junit-jupiter")
 include("gradle-plugin-fixtures-junit-jupiter-sample")
+
+include("gradle-plugin-testing-plugin")
+include("gradle-plugin-testing-helper")
